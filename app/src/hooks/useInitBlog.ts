@@ -1,4 +1,3 @@
-import { PostCardData } from '@types';
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable comma-dangle */
@@ -7,7 +6,6 @@ import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
 import { PostCardData, UserData } from "@types";
 import { getKeys, getPostById, getProgram, getUser, getUserKey, notify } from "@utils";
 import { useCallback, useEffect, useState } from "react";
-import { PostCard } from '../components/postCard/index';
 
 type UseBlogHook = (walletAddress?: PublicKey) => {
   user?: UserData | null;
