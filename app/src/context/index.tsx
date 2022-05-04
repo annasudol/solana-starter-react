@@ -12,9 +12,9 @@ import { useCallback, useEffect, useState } from "react";
 export type WalletSolContextType = {
   user?: UserData | null;
   isInitBlog?: boolean;
-  initBlog?: (walletKey: PublicKey) => Promise<TypeDef<IdlTypeDef, IdlTypes<Idl>> | undefined>;
-  signUpUser?: (data: { name: string }) => Promise<string | undefined>;
-  createPost?: (data: { title: string; userID: string }) => Promise<string | undefined>;
+  initBlog: (walletKey: PublicKey) => Promise<TypeDef<IdlTypeDef, IdlTypes<Idl>> | undefined>;
+  signUpUser: (data: { name: string }) => Promise<string | undefined>;
+  createPost: (data: { title: string; userID: string }) => Promise<string | undefined>;
   postList?: PostCardData[];
 };
 
