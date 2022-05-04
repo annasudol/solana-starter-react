@@ -1,3 +1,4 @@
+import { PostCardData } from '@types';
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable comma-dangle */
@@ -6,6 +7,7 @@ import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
 import { PostCardData, UserData } from "@types";
 import { getKeys, getPostById, getProgram, getUser, getUserKey, notify } from "@utils";
 import { useCallback, useEffect, useState } from "react";
+import { PostCard } from '../components/postCard/index';
 
 type UseBlogHook = (walletAddress?: PublicKey) => {
   user?: UserData | null;
@@ -18,7 +20,7 @@ type UseBlogHook = (walletAddress?: PublicKey) => {
 
 export const useInitBlog: UseBlogHook = (walletAddress) => {
   const [user, setUser] = useState<UserData | null>();
-  const [postList, setPostList] = useState<PostCardData[]>();
+  const [postList, setPostList] = useState<PostCardData[]>([]);
   const [isInitBlog, setIsInitBlog] = useState<boolean | undefined>();
 
   const signUpUser = useCallback(
@@ -66,6 +68,11 @@ export const useInitBlog: UseBlogHook = (walletAddress) => {
             },
             signers: [postAccount],
           });
+
+          const post = await getPostById(postAccount.publicKey, userID);
+          post && setPostList((posts) => [post as unknown as PostCardData, ...posts]);
+
+          console.log(postList);
           return tx;
         } catch {}
       }
@@ -120,9 +127,8 @@ export const useInitBlog: UseBlogHook = (walletAddress) => {
   const fetchPosts = async (id: string, user: string) => {
     const post: any = await getPostById(new PublicKey(id), user);
     if (post) {
-      if (!postList || postList.length === 0 || !postList.some((item) => item.id === post.id)) {
-        setPostList((posts) => (posts ? [...posts, post] : [post]));
-        console.log(postList, "postList");
+      if (!postList || postList.length === 0 || !postList.some((item) => item.id === id)) {
+        setPostList((posts) => [...posts, post]);
         if (post.prePostId !== "11111111111111111111111111111111") await fetchPosts(post.prePostId, user);
       }
     }
