@@ -103,6 +103,10 @@ export const useInitBlog: UseBlogHook = (walletAddress) => {
           message: "Created init blog",
           txid,
         });
+        const id = blog.currentPostId.toString();
+        const userId = user?.id;
+        userId && (await fetchPosts(id, userId));
+        setIsInitBlog(false);
         return blog;
       } catch (e) {
         notify({
