@@ -76,7 +76,6 @@ export async function getBlog(program: Program, id: any) {
         prePostId: post.prePostId.toString(),
         user
       };
-    } catch (e: any) {
-      console.log(e, "e");
+    } catch  {
     }
   };
