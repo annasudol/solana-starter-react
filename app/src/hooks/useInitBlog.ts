@@ -125,7 +125,7 @@ export const useInitBlog: UseBlogHook = (walletAddress) => {
   const fetchPosts = async (id: string, user: string) => {
     const post: any = await getPostById(new PublicKey(id), user);
     if (post) {
-      if (!postList || postList.length === 0 || !postList.some((item) => item.id === id)) {
+      if (postList.length === 0 || !postList.some((item) => item.id === post.id)) {
         setPostList((posts) => [...posts, post]);
         if (post.prePostId !== "11111111111111111111111111111111") await fetchPosts(post.prePostId, user);
       }
