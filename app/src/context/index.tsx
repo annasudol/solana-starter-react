@@ -1,7 +1,8 @@
 /* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 // context/WalletSolContext.tsx
+import { Idl, IdlTypeDef } from "@project-serum/anchor/dist/cjs/idl";
+import { IdlTypes, TypeDef } from "@project-serum/anchor/dist/cjs/program/namespace/types";
 import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
 import { PostCardData, UserData } from "@types";
 import { getKeys, getPostById, getProgram, getUser, getUserKey, notify } from "@utils";
@@ -11,9 +12,9 @@ import { useCallback, useEffect, useState } from "react";
 export type WalletSolContextType = {
   user?: UserData | null;
   isInitBlog?: boolean;
-  initBlog?: any;
-  signUpUser?: any;
-  createPost?: any;
+  initBlog?: (walletKey: PublicKey) => Promise<TypeDef<IdlTypeDef, IdlTypes<Idl>> | undefined>;
+  signUpUser?: (data: { name: string }) => Promise<string | undefined>;
+  createPost?: (data: { title: string; userID: string }) => Promise<string | undefined>;
   postList?: PostCardData[];
 };
 
@@ -30,8 +31,6 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
 
   const signUpUser = useCallback(
     async (data: { name: string }) => {
-      console.log(walletAddress, "walletAddress");
-
       if (walletAddress) {
         const { name } = data;
         const program = getProgram();
