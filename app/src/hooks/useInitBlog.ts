@@ -13,6 +13,7 @@ type UseBlogHook = (walletAddress?: PublicKey) => {
   initBlog?: any;
   signUpUser?: any;
   createPost?: any;
+  postList?: PostCardData[];
 };
 
 export const useInitBlog: UseBlogHook = (walletAddress) => {
@@ -167,5 +168,6 @@ export const useInitBlog: UseBlogHook = (walletAddress) => {
     initBlog,
     signUpUser,
     createPost,
+    postList,
   };
 };
