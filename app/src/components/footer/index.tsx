@@ -43,8 +43,8 @@ const navigation = {
 
 export const Footer = () => (
   <footer className="bg-white fixed bottom-0 left-0 right-0">
-    <div className="max-w-12xl mx-auto py-12 px-2 overflow-hidden sm:px-6 lg:px-4">
-      <div className="mt-8 flex justify-center space-x-6">
+    <div className="max-w-12xl mx-auto p-2 overflow-hidden sm:px-6 lg:px-4">
+      <div className="mt-2 flex justify-center space-x-3">
         {navigation.social.map((item) => (
           <a key={item.name} className="text-gray-400 hover:text-gray-500" href={item.href}>
             <span className="sr-only">{item.name}</span>
@@ -52,7 +52,7 @@ export const Footer = () => (
           </a>
         ))}
       </div>
-      <p className="mt-8 text-center text-base text-gray-400">&copy; 2020 Workflow, Inc. All rights reserved.</p>
+      <p className="mt-2 text-center text-base text-gray-400">&copy; 2020 Workflow, Inc. All rights reserved.</p>
     </div>
   </footer>
 );
