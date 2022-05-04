@@ -8,6 +8,7 @@ export const Main = () => {
   const onCreatePost = async (title: string) => {
     try {
       const userID = user?.id;
+      console.log(userID, 'userID');
       if (userID) {
         const tx = await createPost(title, userID);
         tx &&

@@ -51,7 +51,7 @@ export const useWallet: UseWallet = () => {
       const response = await solana.connect();
       // eslint-disable-next-line no-console
       console.log("Connected with Public Key:", response.publicKey.toString(), response, "res");
-      setWalletAddress(response.publicKey.toString());
+      setWalletAddress(response);
     }
   };
 
