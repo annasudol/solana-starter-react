@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { PublicKey } from "@solana/web3.js";
+
 export enum ACCOUNT_ERROR {
   NOT_CREATED = "NOT_CREATED",
 }
@@ -12,3 +15,10 @@ export interface PostCardData {
   user: string;
   prepostId: string;
 }
+
+export type UseWallet = () => {
+  walletAddress?: PublicKey;
+  connectWallet: () => Promise<void>;
+};
+
+export type ExtendedWindow = Window & typeof globalThis & { solana: any };

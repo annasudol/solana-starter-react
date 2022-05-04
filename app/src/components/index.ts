@@ -1,7 +1,9 @@
 export { Button } from "./button";
 export { ConnectWallet } from "./connectWallet";
 export { Footer } from "./footer";
-export { Form } from "./Form";
+export { Form } from "./form";
+export { Header } from "./header";
+export { Main } from "./main";
 export { NotificationList } from "./notificationList";
 export { PostCard } from "./postCard";
 export { TransactionLink } from "./transactionLink";

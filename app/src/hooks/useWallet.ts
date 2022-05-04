@@ -1,15 +1,11 @@
 /* eslint-disable no-console */
 import { PublicKey } from "@solana/web3.js";
+import { UseWallet } from "@types";
 import { useEffect, useState } from "react";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ExtendedWindow = Window & typeof globalThis & { solana: any };
 
-type UseWallettHook = () => {
-  walletAddress?: PublicKey;
-  connectWallet: () => Promise<void>;
-};
-
-export const useWallet: UseWallettHook = () => {
+export const useWallet: UseWallet = () => {
   const [walletAddress, setWalletAddress] = useState<PublicKey>();
 
   /*

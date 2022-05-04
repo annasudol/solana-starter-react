@@ -29,7 +29,9 @@
       "@layout/*": ["src/layout/*"],
       "@layout": ["src/layout/"],
       "@types/*": ["src/types/*"],
-      "@types": ["src/types"]
+      "@types": ["src/types"],
+      "@context/*": ["src/context/*"],
+      "@context": ["src/context"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "scripts/createKeyPair.mts"],
