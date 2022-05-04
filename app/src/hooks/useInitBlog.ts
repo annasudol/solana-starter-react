@@ -16,7 +16,7 @@ type UseBlogHook = (walletAddress?: PublicKey) => {
 
 export const useInitBlog: UseBlogHook = (walletAddress) => {
   const [user, setUser] = useState<UserData | null>();
-  const [postList, setPostList] = useState<PostCard[]>([]);
+  const [postList, setPostList] = useState<PostCard[]>();
   const [isInitBlog, setIsInitBlog] = useState<boolean | undefined>();
 
   const signUpUser = useCallback(
@@ -71,39 +71,40 @@ export const useInitBlog: UseBlogHook = (walletAddress) => {
         const blog = await program.account.blogState.fetch(initBlogKey.publicKey);
         notify({
           type: "success",
-          message: "Created initBlog",
+          message: "Created init blog",
           txid,
         });
-        console.log("Blog pubkey: ", initBlogKey.publicKey.toString());
-        console.log("Blog: ", blog);
         return blog;
       } catch (e) {
-        console.log(e, "error");
+        notify({
+          type: "error",
+          message: "Error, ply try later",
+        });
       }
     }
   };
 
   const fetchPosts = async (id: string, user: string) => {
     const post: any = await getPostById(new PublicKey(id), user);
-    if (postList.length === 0 || !postList.some((item) => item.id === post.id)) {
-      setPostList((posts) => [post, ...posts]);
-      if (post.prePostId !== "11111111111111111111111111111111") await fetchPosts(post.prePostId, user);
+    if (post) {
+      if (!postList || postList.length === 0 || !postList.some((item) => item.id === post.id)) {
+        setPostList((posts) => (posts ? [...posts, post] : [post]));
+        if (post.prePostId !== "11111111111111111111111111111111") await fetchPosts(post.prePostId, user);
+      }
     }
   };
 
-  const fetchBlog = useCallback(async (blogAccount: any, user: string) => {
+  const fetchBlog = useCallback(async (blogAccount: any, userId: string) => {
     const program = getProgram();
 
     try {
       const blog = await program.account.blogState.fetch(blogAccount.publicKey);
-      if (blog?.currentPostKey) await fetchPosts(blog?.currentPostKey, user);
-      console.log(postList);
+      const id = blog?.currentPostId;
+
+      id && userId && (await fetchPosts(id, userId));
       return blog;
     } catch (err) {
-      console.log("err", err);
       setIsInitBlog(true);
-      console.log("err", isInitBlog);
-
       notify({
         type: "error",
         message: "Please create initial blog",
@@ -118,7 +119,7 @@ export const useInitBlog: UseBlogHook = (walletAddress) => {
         if (user) {
           const { initBlogKey } = getKeys();
           const blog = await fetchBlog(initBlogKey, user.id);
-          !blog && setIsInitBlog(true);
+          setIsInitBlog(!blog);
         }
       } catch (err) {
         console.log(err, "err");

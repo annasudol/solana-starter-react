@@ -25,7 +25,6 @@ export const Header = () => {
   };
   return (
     <header className="pt-8 flex flex-col items-center">
-
       {!walletAddress ? (
         <ConnectWallet onClick={connectWallet} />
       ) : (

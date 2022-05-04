@@ -1,44 +1,45 @@
 /* eslint-disable no-console */
 import { Button, Footer, Form, Header, NotificationList } from "@components";
 import { appConfig } from "@config";
-import { useBlog, useWallet } from "@hooks";
+import { useInitBlog, useWallet } from "@hooks";
 import { Meta } from "@layout";
 import { notify } from "@utils/notify";
 
 const Home = () => {
   const { walletAddress } = useWallet();
-  // const { isInitBlog, createPost, postList } = useBlog(walletAddress);
+  const { isInitBlog, createPost, postList } = useInitBlog(walletAddress);
   // const { user, signUpUser, isInitBlog, initBlog } = useBlog(walletAddress);
-  // const onCreatePost = async (title: string) => {
-  //   try {
-  //     const tx = await createPost({ title });
-  //     tx &&
-  //       notify({
-  //         type: "success",
-  //         message: "Signed up user successfully",
-  //         txid: tx as string,
-  //       });
-  //   } catch (e) {
-  //     notify({
-  //       type: "error",
-  //       message: "please try later",
-  //     });
-  //   }
-  // };
+  const onCreatePost = async (title: string) => {
+    // try {
+    //   const tx = await createPost({ title });
+    //   tx &&
+    //     notify({
+    //       type: "success",
+    //       message: "Signed up user successfully",
+    //       txid: tx as string,
+    //     });
+    // } catch (e) {
+    //   notify({
+    //     type: "error",
+    //     message: "please try later",
+    //   });
+    // }
+  };
+  console.log(isInitBlog, "")
 
   return (
     <div className="max-w-7xl mx-auto sm:px-6 flex flex-col items-center justify-center">
       <Meta description={appConfig.description} title={appConfig.title} />
       <Header />
       <main>
-        {/* {console.log(isInitBlog, 'isInitBlog')}
+        {/* {/* {console.log(isInitBlog, 'isInitBlog')}
         {isInitBlog ? (
           <Button onClick={() => initBlog(walletAddress)}>initBlog</Button>
         ) : (
           <Form onSubmit={onCreatePost} />
         )} */}
-        {/* <Button onClick={() => initBlog(walletAddress)}>initBlog</Button>
-        {!!isInitBlog && <Form onSubmit={onCreatePost} />} */}
+        {/* <Button onClick={() => initBlog(walletAddress)}>initBlog</Button> */}
+        {!!isInitBlog && <Form onSubmit={onCreatePost} />}
       </main>
       <Footer />
       <NotificationList />
