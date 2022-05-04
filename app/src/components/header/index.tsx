@@ -11,7 +11,7 @@ export const Header: React.FunctionComponent<Props> = ({ walletAddress, connectW
   const { user, isInitBlog, initBlog, signUpUser } = React.useContext(WalletSolContext) as WalletSolContextType;
   const onSignUpUser = async (name: string) => {
     try {
-      const tx = await signUpUser({ name });
+      const tx = await signUpUser(name);
       tx &&
         notify({
           type: "success",

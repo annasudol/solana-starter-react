@@ -13,7 +13,7 @@ export type WalletSolContextType = {
   user?: UserData | null;
   isInitBlog?: boolean;
   initBlog: (walletKey: PublicKey) => Promise<TypeDef<IdlTypeDef, IdlTypes<Idl>> | undefined>;
-  signUpUser: (data: { name: string }) => Promise<string | undefined>;
+  signUpUser: (name: string) => Promise<string | undefined>;
   createPost: (data: { title: string; userID: string }) => Promise<string | undefined>;
   postList?: PostCardData[];
 };
@@ -29,30 +29,26 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
   const [postList, setPostList] = useState<PostCardData[]>([]);
   const [isInitBlog, setIsInitBlog] = useState<boolean | undefined>();
 
-  const signUpUser = useCallback(
-    async (data: { name: string }) => {
-      if (walletAddress) {
-        const { name } = data;
-        const program = getProgram();
-        const userAccount = getUserKey(walletAddress);
+  const signUpUser = async (name: string) => {
+    if (walletAddress) {
+      const program = getProgram();
+      const userAccount = getUserKey(walletAddress);
 
-        try {
-          const tx = await program.rpc.signupUser(name, {
-            accounts: {
-              authority: walletAddress,
-              userAccount: userAccount.publicKey,
-              systemProgram: SystemProgram.programId,
-            },
-            signers: [userAccount],
-          });
-          const user = await getUser(program, walletAddress);
-          user && setUser(user);
-          return tx;
-        } catch {}
-      }
-    },
-    [walletAddress]
-  );
+      try {
+        const tx = await program.rpc.signupUser(name, {
+          accounts: {
+            authority: walletAddress,
+            userAccount: userAccount.publicKey,
+            systemProgram: SystemProgram.programId,
+          },
+          signers: [userAccount],
+        });
+        const user = await getUser(program, walletAddress);
+        user && setUser(user);
+        return tx;
+      } catch {}
+    }
+  };
 
   const createPost = useCallback(
     async (data: { title: string; userID: string }) => {
