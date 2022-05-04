@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_lang::solana_program::entrypoint::ProgramResult;
 
 
-declare_id!("nsdJrLLi445r4tURcinwgtCpReFUz9LmkQmSGK3e445");
+declare_id!("nsdJrLLi445r4tURcinwgtCpReFUz9LmkQmSGK3e445nsdJrLLi445r4tURcinwgtCpReFUz9LmkQmSGK3e445");
 
 #[program]
 pub mod blog {

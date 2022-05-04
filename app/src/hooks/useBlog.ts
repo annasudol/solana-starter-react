@@ -23,13 +23,14 @@ type UseBlogHook = (walletAddress?: PublicKey) => {
   createPost?: any;
   postList?: any[];
   updatePost?: any;
+  signUpUser?: any;
 };
 export const useBlog: UseBlogHook = (walletAddress) => {
   const [user, setUser] = useState<UserData>();
   const [postList, setPostList] = useState<PostCard[]>([]);
   const [isInitBlog, setIsInitBlog] = useState<boolean>();
 
-  const signupUser = useCallback(
+  const signUpUser = useCallback(
     async (data: { name: string }) => {
       if (walletAddress) {
         const { name } = data;
@@ -45,7 +46,8 @@ export const useBlog: UseBlogHook = (walletAddress) => {
             },
             signers: [userAccount],
           });
-
+          const user = await getUser(program, walletAddress);
+          user && setUser(user);
           return tx;
         } catch {}
       }
@@ -53,25 +55,14 @@ export const useBlog: UseBlogHook = (walletAddress) => {
     [walletAddress]
   );
 
-  const fetchUser = useCallback(
-    async (walletAddress: PublicKey) => {
-      if (walletAddress) {
-        const program = getProgram();
-        const user = await getUser(program, walletAddress);
-
-        if (!user) {
-          const name = "Anna";
-          await signupUser({ name });
-          const user = await getUser(program, walletAddress);
-          setUser(user);
-          return user;
-        }
-        setUser(user);
-        return user;
-      }
-    },
-    [signupUser]
-  );
+  const fetchUser = useCallback(async (walletAddress: PublicKey) => {
+    if (walletAddress) {
+      const program = getProgram();
+      const user = await getUser(program, walletAddress);
+      user ? setUser(user) : setUser(null);
+      return user;
+    }
+  }, []);
 
   const initBlog = async (walletKey: PublicKey) => {
     const { genesisPostKey, initBlogKey } = getKeys();
@@ -163,11 +154,7 @@ export const useBlog: UseBlogHook = (walletAddress) => {
   useEffect(() => {
     const onGetUser = async (walletAddress: PublicKey) => {
       try {
-        const user = await fetchUser(walletAddress);
-        if (user) {
-          const { initBlogKey } = getKeys();
-          fetchBlog(initBlogKey, user.id);
-        }
+        await fetchUser(walletAddress);
       } catch (err) {
         console.log(err, "err");
         notify({
@@ -186,5 +173,6 @@ export const useBlog: UseBlogHook = (walletAddress) => {
     createPost,
     postList,
     updatePost,
+    signUpUser,
   };
 };
