@@ -35,10 +35,10 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
       const userAccount = getUserKey(walletAddress);
 
       try {
-        const tx = await program.rpc.signUpUser(name, {
+        const tx = await program.rpc.signupUser(name, {
           accounts: {
             authority: walletAddress,
-            user: userAccount.publicKey,
+            userAccount: userAccount.publicKey,
             systemProgram: SystemProgram.programId,
           },
           signers: [userAccount],
@@ -46,12 +46,7 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
         const user = await getUser(program, walletAddress);
         user && setUser(user);
         return tx;
-      } catch (e) {
-        notify({
-          type: "error",
-          message: "Error with creating new user",
-        });
-      }
+      } catch {}
     }
   };
 
@@ -60,14 +55,14 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
     if (walletAddress && initBlogKey?.publicKey) {
       const program = getProgram();
       const postAccount = Keypair.generate();
+
       try {
-        console.log(SystemProgram.programId, 'SystemProgram.programId')
         const tx = await program.rpc.createPost(title, {
           accounts: {
-            post: postAccount.publicKey,
-            user: new PublicKey(userID),
-            blog: initBlogKey?.publicKey,
+            blogAccount: initBlogKey?.publicKey,
             authority: walletAddress,
+            userAccount: new PublicKey(userID),
+            postAccount: postAccount.publicKey,
             systemProgram: SystemProgram.programId,
           },
           signers: [postAccount],
@@ -76,13 +71,7 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
         const post = await getPostById(postAccount.publicKey, userID);
         post && setPostList((posts) => [post as unknown as PostCardData, ...posts]);
         return tx;
-      } catch (e) {
-        console.log(e, "e")
-        notify({
-          type: "error",
-          message: "Error with creating new post",
-        });
-      }
+      } catch {}
     }
   };
 
@@ -124,7 +113,7 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
       } catch (e) {
         notify({
           type: "error",
-          message: "Error, please try later",
+          message: "Error, ply try later",
         });
       }
     }
