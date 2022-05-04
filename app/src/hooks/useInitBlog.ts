@@ -2,33 +2,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable comma-dangle */
 /* eslint-disable no-console */
-import { PostCard } from "@components";
-import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
+import { PublicKey, SystemProgram } from "@solana/web3.js";
+import { PostCard, UserData } from "@types";
 import { getKeys, getPostById, getProgram, getUser, getUserKey, notify } from "@utils";
 import { useCallback, useEffect, useState } from "react";
-
-export enum ACCOUNT_ERROR {
-  NOT_CREATED = "NOT_CREATED",
-}
-interface UserData {
-  name: string;
-  id: string;
-}
 
 type UseBlogHook = (walletAddress?: PublicKey) => {
   user?: UserData | null;
   isInitBlog?: boolean;
-  currentPostKey?: PublicKey;
   initBlog?: any;
-  createPost?: any;
-  postList?: any[];
-  updatePost?: any;
   signUpUser?: any;
 };
-export const useBlog: UseBlogHook = (walletAddress) => {
+
+export const useInitBlog: UseBlogHook = (walletAddress) => {
   const [user, setUser] = useState<UserData | null>();
   const [postList, setPostList] = useState<PostCard[]>([]);
-  const [isInitBlog, setIsInitBlog] = useState<boolean>();
+  const [isInitBlog, setIsInitBlog] = useState<boolean | undefined>();
 
   const signUpUser = useCallback(
     async (data: { name: string }) => {
@@ -93,39 +82,9 @@ export const useBlog: UseBlogHook = (walletAddress) => {
       }
     }
   };
-  interface PostData {
-    title: string;
-    content: string;
-  }
-
-  const createPost = useCallback(
-    async (data: PostData) => {
-      const { initBlogKey } = getKeys();
-
-      if (user && walletAddress && initBlogKey?.publicKey) {
-        const { title, content = "" } = data;
-        const program = getProgram();
-        const postAccount = Keypair.generate();
-
-        const tx = await program.rpc.createPost(title, content, {
-          accounts: {
-            blogAccount: initBlogKey?.publicKey,
-            authority: walletAddress,
-            userAccount: new PublicKey(user.id),
-            postAccount: postAccount.publicKey,
-            systemProgram: SystemProgram.programId,
-          },
-          signers: [postAccount],
-        });
-        return tx;
-      }
-    },
-    [user, walletAddress]
-  );
 
   const fetchPosts = async (id: string, user: string) => {
     const post: any = await getPostById(new PublicKey(id), user);
-
     if (postList.length === 0 || !postList.some((item) => item.id === post.id)) {
       setPostList((posts) => [post, ...posts]);
       if (post.prePostId !== "11111111111111111111111111111111") await fetchPosts(post.prePostId, user);
@@ -138,23 +97,29 @@ export const useBlog: UseBlogHook = (walletAddress) => {
     try {
       const blog = await program.account.blogState.fetch(blogAccount.publicKey);
       if (blog?.currentPostKey) await fetchPosts(blog?.currentPostKey, user);
+      console.log(postList);
+      return blog;
     } catch (err) {
       console.log("err", err);
+      setIsInitBlog(true);
+      console.log("err", isInitBlog);
+
       notify({
         type: "error",
         message: "Please create initial blog",
       });
-      setIsInitBlog(true);
     }
   }, []);
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const updatePost = () => {};
 
   useEffect(() => {
     const onGetUser = async (walletAddress: PublicKey) => {
       try {
-        await fetchUser(walletAddress);
+        const user = await fetchUser(walletAddress);
+        if (user) {
+          const { initBlogKey } = getKeys();
+          const blog = await fetchBlog(initBlogKey, user.id);
+          !blog && setIsInitBlog(true);
+        }
       } catch (err) {
         console.log(err, "err");
         notify({
@@ -170,9 +135,6 @@ export const useBlog: UseBlogHook = (walletAddress) => {
     user,
     isInitBlog,
     initBlog,
-    createPost,
-    postList,
-    updatePost,
     signUpUser,
   };
 };

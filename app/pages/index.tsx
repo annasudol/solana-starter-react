@@ -7,31 +7,38 @@ import { notify } from "@utils/notify";
 
 const Home = () => {
   const { walletAddress } = useWallet();
-  const { isInitBlog, initBlog, createPost } = useBlog(walletAddress);
+  // const { isInitBlog, createPost, postList } = useBlog(walletAddress);
+  // const { user, signUpUser, isInitBlog, initBlog } = useBlog(walletAddress);
+  // const onCreatePost = async (title: string) => {
+  //   try {
+  //     const tx = await createPost({ title });
+  //     tx &&
+  //       notify({
+  //         type: "success",
+  //         message: "Signed up user successfully",
+  //         txid: tx as string,
+  //       });
+  //   } catch (e) {
+  //     notify({
+  //       type: "error",
+  //       message: "please try later",
+  //     });
+  //   }
+  // };
 
-  const onCreatePost = async (title: string) => {
-    try {
-      const tx = await createPost({ title });
-      tx &&
-        notify({
-          type: "success",
-          message: "Signed up user successfully",
-          txid: tx as string,
-        });
-    } catch (e) {
-      notify({
-        type: "error",
-        message: "please try later",
-      });
-    }
-  };
   return (
     <div className="max-w-7xl mx-auto sm:px-6 flex flex-col items-center justify-center">
       <Meta description={appConfig.description} title={appConfig.title} />
       <Header />
       <main>
-        {isInitBlog && <Button onClick={() => initBlog(walletAddress)}>initBlog</Button>}
-        {!!isInitBlog && <Form onSubmit={onCreatePost} />}
+        {/* {console.log(isInitBlog, 'isInitBlog')}
+        {isInitBlog ? (
+          <Button onClick={() => initBlog(walletAddress)}>initBlog</Button>
+        ) : (
+          <Form onSubmit={onCreatePost} />
+        )} */}
+        {/* <Button onClick={() => initBlog(walletAddress)}>initBlog</Button>
+        {!!isInitBlog && <Form onSubmit={onCreatePost} />} */}
       </main>
       <Footer />
       <NotificationList />

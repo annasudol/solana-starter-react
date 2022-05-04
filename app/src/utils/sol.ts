@@ -1,9 +1,9 @@
-import { PROGRAM_KEY } from "@constants";
-import { Idl, IdlTypes, Program, Provider, web3 } from "@project-serum/anchor";
+import { Idl, Program, Provider, web3 } from "@project-serum/anchor";
 
 import { clusterApiUrl, Commitment, Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 
 import idl from "../../../target/idl/blog.json";
+export const PROGRAM_KEY = new PublicKey(idl.metadata.address);
 
 type Opts = {
   preflightCommitment: Commitment;

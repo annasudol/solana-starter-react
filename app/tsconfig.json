@@ -28,8 +28,8 @@
       "@utils": ["src/utils/"],
       "@layout/*": ["src/layout/*"],
       "@layout": ["src/layout/"],
-      "@constants/*": ["src/constants/*"],
-      "@constants": ["src/constants/"]
+      "@types/*": ["src/types/*"],
+      "@types": ["src/types"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "scripts/createKeyPair.mts"],

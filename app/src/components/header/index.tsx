@@ -1,11 +1,11 @@
-import { ConnectWallet, Form } from "@components";
-import { useBlog, useWallet } from "@hooks";
+import { Button, ConnectWallet, Form } from "@components";
+import { useInitBlog, useWallet } from "@hooks";
 import { notify } from "@utils/notify";
 import { truncateAddress } from "@utils/truncateAddress";
 
 export const Header = () => {
   const { walletAddress, connectWallet } = useWallet();
-  const { user, signUpUser } = useBlog(walletAddress);
+  const { user, signUpUser, isInitBlog, initBlog } = useInitBlog(walletAddress);
 
   const onSignUpUser = async (name: string) => {
     try {
@@ -25,6 +25,7 @@ export const Header = () => {
   };
   return (
     <header className="pt-8 flex flex-col items-center">
+
       {!walletAddress ? (
         <ConnectWallet onClick={connectWallet} />
       ) : (
@@ -41,6 +42,7 @@ export const Header = () => {
           )}
           {user === null && <Form btnTitle="Sign up" placeholder="User Name" onSubmit={onSignUpUser} />}
           {user && <p className="font-bold">Logged in as {user?.name}</p>}
+          {isInitBlog && <Button onClick={() => initBlog(walletAddress)}>initBlog</Button>}
         </>
       )}
     </header>
