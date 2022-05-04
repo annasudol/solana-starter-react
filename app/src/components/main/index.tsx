@@ -8,13 +8,15 @@ export const Main = () => {
   const onCreatePost = async (title: string) => {
     try {
       const userID = user?.id;
-      const tx = await createPost({ title, userID });
-      tx &&
-        notify({
-          type: "success",
-          message: "Signed up user successfully",
-          txid: tx as string,
-        });
+      if (userID) {
+        const tx = await createPost(title, userID);
+        tx &&
+          notify({
+            type: "success",
+            message: "Signed up user successfully",
+            txid: tx as string,
+          });
+      }
     } catch (e) {
       notify({
         type: "error",

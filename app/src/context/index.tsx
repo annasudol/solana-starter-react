@@ -14,7 +14,7 @@ export type WalletSolContextType = {
   isInitBlog?: boolean;
   initBlog: (walletKey: PublicKey) => Promise<TypeDef<IdlTypeDef, IdlTypes<Idl>> | undefined>;
   signUpUser: (name: string) => Promise<string | undefined>;
-  createPost: (data: { title: string; userID: string }) => Promise<string | undefined>;
+  createPost: (title: string, userID: string) => Promise<string | undefined>;
   postList?: PostCardData[];
 };
 
@@ -50,37 +50,32 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
     }
   };
 
-  const createPost = useCallback(
-    async (data: { title: string; userID: string }) => {
-      const { initBlogKey } = getKeys();
+  const createPost = async (title: string, userID: string) => {
+    const { initBlogKey } = getKeys();
+    if (walletAddress && initBlogKey?.publicKey) {
+      const program = getProgram();
+      const postAccount = Keypair.generate();
 
-      if (walletAddress && initBlogKey?.publicKey) {
-        const { title, userID } = data;
-        const program = getProgram();
-        const postAccount = Keypair.generate();
+      try {
+        const tx = await program.rpc.createPost(title, {
+          accounts: {
+            blogAccount: initBlogKey?.publicKey,
+            authority: walletAddress,
+            userAccount: new PublicKey(userID),
+            postAccount: postAccount.publicKey,
+            systemProgram: SystemProgram.programId,
+          },
+          signers: [postAccount],
+        });
 
-        try {
-          const tx = await program.rpc.createPost(title, {
-            accounts: {
-              blogAccount: initBlogKey?.publicKey,
-              authority: walletAddress,
-              userAccount: new PublicKey(userID),
-              postAccount: postAccount.publicKey,
-              systemProgram: SystemProgram.programId,
-            },
-            signers: [postAccount],
-          });
+        const post = await getPostById(postAccount.publicKey, userID);
+        post && setPostList((posts) => [post as unknown as PostCardData, ...posts]);
 
-          const post = await getPostById(postAccount.publicKey, userID);
-          post && setPostList((posts) => [post as unknown as PostCardData, ...posts]);
-
-          console.log(postList);
-          return tx;
-        } catch {}
-      }
-    },
-    [walletAddress]
-  );
+        console.log(postList);
+        return tx;
+      } catch {}
+    }
+  };
 
   const fetchUser = useCallback(async (walletAddress: PublicKey) => {
     if (walletAddress) {
