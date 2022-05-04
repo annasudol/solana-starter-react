@@ -6,7 +6,7 @@ export interface UserData {
   id: string;
 }
 
-export interface PostCard {
+export interface PostCardData {
   id: string;
   title: string;
   user: string;

@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable comma-dangle */
 /* eslint-disable no-console */
-import { PublicKey, SystemProgram } from "@solana/web3.js";
-import { PostCard, UserData } from "@types";
+import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
+import { PostCardData, UserData } from "@types";
 import { getKeys, getPostById, getProgram, getUser, getUserKey, notify } from "@utils";
 import { useCallback, useEffect, useState } from "react";
 
@@ -12,11 +12,12 @@ type UseBlogHook = (walletAddress?: PublicKey) => {
   isInitBlog?: boolean;
   initBlog?: any;
   signUpUser?: any;
+  createPost?: any;
 };
 
 export const useInitBlog: UseBlogHook = (walletAddress) => {
   const [user, setUser] = useState<UserData | null>();
-  const [postList, setPostList] = useState<PostCard[]>();
+  const [postList, setPostList] = useState<PostCardData[]>();
   const [isInitBlog, setIsInitBlog] = useState<boolean | undefined>();
 
   const signUpUser = useCallback(
@@ -37,6 +38,33 @@ export const useInitBlog: UseBlogHook = (walletAddress) => {
           });
           const user = await getUser(program, walletAddress);
           user && setUser(user);
+          return tx;
+        } catch {}
+      }
+    },
+    [walletAddress]
+  );
+
+  const createPost = useCallback(
+    async (data: { title: string; userID: string }) => {
+      const { initBlogKey } = getKeys();
+
+      if (walletAddress && initBlogKey?.publicKey) {
+        const { title, userID } = data;
+        const program = getProgram();
+        const postAccount = Keypair.generate();
+
+        try {
+          const tx = await program.rpc.createPost(title, {
+            accounts: {
+              blogAccount: initBlogKey?.publicKey,
+              authority: walletAddress,
+              userAccount: new PublicKey(userID),
+              postAccount: postAccount.publicKey,
+              systemProgram: SystemProgram.programId,
+            },
+            signers: [postAccount],
+          });
           return tx;
         } catch {}
       }
@@ -89,6 +117,7 @@ export const useInitBlog: UseBlogHook = (walletAddress) => {
     if (post) {
       if (!postList || postList.length === 0 || !postList.some((item) => item.id === post.id)) {
         setPostList((posts) => (posts ? [...posts, post] : [post]));
+        console.log(postList, "postList");
         if (post.prePostId !== "11111111111111111111111111111111") await fetchPosts(post.prePostId, user);
       }
     }
@@ -137,5 +166,6 @@ export const useInitBlog: UseBlogHook = (walletAddress) => {
     isInitBlog,
     initBlog,
     signUpUser,
+    createPost,
   };
 };
