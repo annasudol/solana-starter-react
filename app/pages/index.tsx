@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { Button, ConnectWallet, Footer, Form, Header, NotificationList } from "@components";
+import { Button, ConnectWallet, Footer, Form, NotificationList, PostCard } from "@components";
 import { appConfig } from "@config";
 import { useInitBlog, useWallet } from "@hooks";
 import { Meta } from "@layout";
@@ -8,9 +8,8 @@ import { truncateAddress } from "@utils/truncateAddress";
 
 const Home = () => {
   const { walletAddress, connectWallet } = useWallet();
-  const { user, signUpUser, isInitBlog, initBlog, createPost } = useInitBlog(walletAddress);
+  const { user, signUpUser, isInitBlog, initBlog, createPost, postList } = useInitBlog(walletAddress);
 
-  // const { user, signUpUser, isInitBlog, initBlog } = useBlog(walletAddress);
   const onCreatePost = async (title: string) => {
     try {
       const userID = user?.id;
@@ -70,14 +69,10 @@ const Home = () => {
         )}
       </header>
       <main>
-        {/* {/* {console.log(isInitBlog, 'isInitBlog')}
-        {isInitBlog ? (
-          <Button onClick={() => initBlog(walletAddress)}>initBlog</Button>
-        ) : (
-          <Form onSubmit={onCreatePost} />
-        )} */}
-        {/* <Button onClick={() => initBlog(walletAddress)}>initBlog</Button> */}
         {isInitBlog === false && <Form onSubmit={onCreatePost} />}
+        {postList?.map(({ id, title, user, prepostId }) => (
+          <PostCard key={id} id={id} prepostId={prepostId} title={title} user={user} />
+        ))}
       </main>
       <Footer />
       <NotificationList />
