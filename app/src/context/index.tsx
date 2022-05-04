@@ -70,8 +70,6 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
 
         const post = await getPostById(postAccount.publicKey, userID);
         post && setPostList((posts) => [post as unknown as PostCardData, ...posts]);
-
-        console.log(postList);
         return tx;
       } catch {}
     }
@@ -122,10 +120,10 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
   };
 
   const fetchPosts = async (id: string, user: string) => {
-    const post: any = await getPostById(new PublicKey(id), user);
+    const post = await getPostById(new PublicKey(id), user);
     if (post) {
       if (postList.length === 0 || !postList.some((item) => item.id === post.id)) {
-        setPostList((posts) => [...posts, post]);
+        setPostList((posts) => [...posts, post as unknown as PostCardData]);
         if (post.prePostId !== "11111111111111111111111111111111") await fetchPosts(post.prePostId, user);
       }
     }
@@ -153,8 +151,6 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
     const onGetUser = async (walletAddress: PublicKey) => {
       try {
         const user = await fetchUser(walletAddress);
-        console.log(walletAddress, "walletAddress");
-
         if (user) {
           const { initBlogKey } = getKeys();
           let blog;
@@ -169,8 +165,6 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
         });
       }
     };
-    console.log(walletAddress, "walletAddress");
-
     walletAddress && onGetUser(walletAddress);
   }, [fetchUser, walletAddress]);
 

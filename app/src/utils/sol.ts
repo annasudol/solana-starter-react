@@ -67,10 +67,8 @@ export async function getBlog(program: Program, id: any) {
   
   export const getPostById = async (postId: PublicKey, user: string) => {
     const program = getProgram();
-    console.log(program.account, postId, 'getPostById')
     try {
       const post: any = await program.account.postState.fetch(postId);
-      console.log(post, 'post')
 
       return {
         id: postId.toString(),
