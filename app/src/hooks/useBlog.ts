@@ -16,7 +16,7 @@ interface UserData {
 }
 
 type UseBlogHook = (walletAddress?: PublicKey) => {
-  user?: UserData;
+  user?: UserData | null;
   isInitBlog?: boolean;
   currentPostKey?: PublicKey;
   initBlog?: any;
@@ -26,7 +26,7 @@ type UseBlogHook = (walletAddress?: PublicKey) => {
   signUpUser?: any;
 };
 export const useBlog: UseBlogHook = (walletAddress) => {
-  const [user, setUser] = useState<UserData>();
+  const [user, setUser] = useState<UserData | null>();
   const [postList, setPostList] = useState<PostCard[]>([]);
   const [isInitBlog, setIsInitBlog] = useState<boolean>();
 
@@ -159,7 +159,7 @@ export const useBlog: UseBlogHook = (walletAddress) => {
         console.log(err, "err");
         notify({
           type: "error",
-          message: "Error with fetch blog",
+          message: "Error with get user",
         });
       }
     };

@@ -1,19 +1,17 @@
 /* eslint-disable no-console */
-import { Button, ConnectWallet, Footer, Form, Header, NotificationList, PostCard, } from "@components";
+import { Button, Footer, Form, Header, NotificationList } from "@components";
 import { appConfig } from "@config";
 import { useBlog, useWallet } from "@hooks";
 import { Meta } from "@layout";
 import { notify } from "@utils/notify";
-import { truncateAddress } from "@utils/truncateAddress";
-import { useCallback } from "react";
 
 const Home = () => {
-  const { walletAddress, connectWallet } = useWallet();
-  const { isInitBlog, initBlog, createPost, postList, user, signUpUser } = useBlog(walletAddress);
+  const { walletAddress } = useWallet();
+  const { isInitBlog, initBlog, createPost } = useBlog(walletAddress);
 
-  const onSignUpUser = async (name: string) => {
+  const onCreatePost = async (title: string) => {
     try {
-      const tx = await signUpUser({ name });
+      const tx = await createPost({ title });
       tx &&
         notify({
           type: "success",
@@ -28,16 +26,21 @@ const Home = () => {
     }
   };
   return (
-    <div className="max-w-7xl mx-auto sm:px-6 flex justify-center">
+    <div className="max-w-7xl mx-auto sm:px-6 flex flex-col items-center justify-center">
       <Meta description={appConfig.description} title={appConfig.title} />
       <Header />
+      <main>
+        {isInitBlog && <Button onClick={() => initBlog(walletAddress)}>initBlog</Button>}
+        {!!isInitBlog && <Form onSubmit={onCreatePost} />}
+      </main>
       <Footer />
       <NotificationList />
     </div>
   );
 };
 export default Home;
-{/* <main className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+{
+  /* <main className="max-w-7xl mx-auto sm:px-6 lg:px-8">
 <div className="flex justify-center pt-8">
   <div>
     <div className="flex flex-col items-center">
@@ -55,18 +58,23 @@ export default Home;
           )}
           {user === null && <Form btnTitle="Sign up" placeholder="User Name" onSubmit={onSignUpUser} />}
           {user && <p className="font-bold">Logged in as {user?.name}</p>}
-          {/* )} */}
+          {/* )} */
+}
 
-          {/* ) : (
+{
+  /* ) : (
             <Form btnTitle="Sign up" placeholder="User Name" onSubmit={onSignUpUser} />
             <p className="font-bold">Logged in as {user?.name}</p>
-          )} */}
+          )} */
+}
 
-          {/* {isInitBlog ? (
+{
+  /* {isInitBlog ? (
             <Button onClick={() => initBlog(walletAddress)}>initBlog</Button>
           ) : (
             <PostForm onSubmit={onCreatePost} />
-          )} */}
+          )} */
+}
 //           <NotificationList />
 //         </>
 //       )}
