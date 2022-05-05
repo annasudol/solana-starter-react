@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
-import { PublicKey } from "@solana/web3.js";
+// import { PublicKey } from "@solana/web3.js";
 import { UseWallet } from "@types";
 import { useEffect, useState } from "react";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ExtendedWindow = Window & typeof globalThis & { solana: any };
 
 export const useWallet: UseWallet = () => {
-  const [walletAddress, setWalletAddress] = useState<PublicKey>();
+  const [walletAddress, setWalletAddress] = useState<string>();
 
   /*
    * This function holds the logic for deciding if a Phantom Wallet is
@@ -30,7 +30,7 @@ export const useWallet: UseWallet = () => {
           /*
            * Set the user's publicKey in state to be used later!
            */
-          setWalletAddress(response);
+          setWalletAddress(response.publicKey.toString());
         }
       } else {
         alert("Solana object not found! Get a Phantom Wallet 👻");

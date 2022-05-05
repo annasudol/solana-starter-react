@@ -1,18 +1,22 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
 // context/WalletSolContext.tsx
+import * as anchor from "@project-serum/anchor";
 import { Idl, IdlTypeDef } from "@project-serum/anchor/dist/cjs/idl";
 import { IdlTypes, TypeDef } from "@project-serum/anchor/dist/cjs/program/namespace/types";
-import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
+import { Keypair, PublicKey } from "@solana/web3.js";
 import { PostCardData, UserData } from "@types";
-import { getKeys, getPostById, getProgram, getUser, getUserKey, notify } from "@utils";
+import { getKeys, getPostById, getProgram, getProvider, getUser, getUserKey, notify } from "@utils";
 import * as React from "react";
 import { useCallback, useEffect, useState } from "react";
+
+const { SystemProgram } = anchor.web3;
 
 export type WalletSolContextType = {
   user?: UserData | null;
   isInitBlog?: boolean;
-  initBlog: (walletKey: PublicKey) => Promise<TypeDef<IdlTypeDef, IdlTypes<Idl>> | undefined>;
+  initBlog: () => Promise<TypeDef<IdlTypeDef, IdlTypes<Idl>> | undefined>;
   signUpUser: (name: string) => Promise<string | undefined>;
   createPost: (title: string, userID: string) => Promise<string | undefined>;
   postList?: PostCardData[];
@@ -22,7 +26,7 @@ export const WalletSolContext = React.createContext<WalletSolContextType | null>
 
 type Props = {
   children: React.ReactNode;
-  walletAddress?: PublicKey;
+  walletAddress?: string;
 };
 export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => {
   const [user, setUser] = useState<UserData | null>();
@@ -33,36 +37,43 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
     if (walletAddress) {
       const program = getProgram();
       const userAccount = getUserKey(walletAddress);
-
+      const provider = getProvider();
       try {
-        const tx = await program.rpc.signupUser(name, {
+        const tx = await program.rpc.signUpUser(name, {
           accounts: {
-            authority: walletAddress,
-            userAccount: userAccount.publicKey,
+            authority: provider.wallet.publicKey,
+            user: userAccount.publicKey,
             systemProgram: SystemProgram.programId,
           },
           signers: [userAccount],
         });
         const user = await getUser(program, walletAddress);
         user && setUser(user);
+        setIsInitBlog(true);
         return tx;
-      } catch {}
+      } catch (e) {
+        notify({
+          type: "error",
+          message: "Error with sign up user",
+        });
+      }
     }
   };
 
   const createPost = async (title: string, userID: string) => {
     const { initBlogKey } = getKeys();
-    if (walletAddress && initBlogKey?.publicKey) {
+    if (initBlogKey?.publicKey && user) {
       const program = getProgram();
       const postAccount = Keypair.generate();
+      const provider = getProvider();
 
       try {
         const tx = await program.rpc.createPost(title, {
           accounts: {
-            blogAccount: initBlogKey?.publicKey,
-            authority: walletAddress,
-            userAccount: new PublicKey(userID),
-            postAccount: postAccount.publicKey,
+            post: postAccount.publicKey,
+            blog: initBlogKey.publicKey,
+            authority: provider.wallet.publicKey,
+            user: new PublicKey(user.id),
             systemProgram: SystemProgram.programId,
           },
           signers: [postAccount],
@@ -71,11 +82,16 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
         const post = await getPostById(postAccount.publicKey, userID);
         post && setPostList((posts) => [post as unknown as PostCardData, ...posts]);
         return tx;
-      } catch {}
+      } catch (e) {
+        notify({
+          type: "error",
+          message: "Error with creating post",
+        });
+      }
     }
   };
 
-  const fetchUser = useCallback(async (walletAddress: PublicKey) => {
+  const fetchUser = useCallback(async (walletAddress: string) => {
     if (walletAddress) {
       const program = getProgram();
       const user = await getUser(program, walletAddress);
@@ -84,36 +100,41 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
     }
   }, []);
 
-  const initBlog = async (walletKey: PublicKey) => {
+  const initBlog = async () => {
     const { genesisPostKey, initBlogKey } = getKeys();
     const program = getProgram();
+    const provider = getProvider();
+
     if (initBlogKey && genesisPostKey) {
       try {
         const txid = await program.rpc.initBlog({
           accounts: {
-            authority: walletKey,
+            blog: initBlogKey.publicKey,
+            firstPost: genesisPostKey.publicKey,
+            authority: provider.wallet.publicKey,
             systemProgram: SystemProgram.programId,
-            blogAccount: initBlogKey.publicKey,
-            genesisPostAccount: genesisPostKey.publicKey,
           },
           signers: [initBlogKey, genesisPostKey],
         });
 
         const blog = await program.account.blogState.fetch(initBlogKey.publicKey);
-        notify({
-          type: "success",
-          message: "Created init blog",
-          txid,
-        });
-        const id = blog.currentPostId.toString();
-        const userId = user?.id;
-        userId && (await fetchPosts(id, userId));
-        setIsInitBlog(false);
-        return blog;
+        if (blog) {
+          const id = blog?.lastPostId.toString();
+          const userId = user?.id;
+          userId && (await fetchPosts(id, userId));
+          setIsInitBlog(false);
+          notify({
+            type: "success",
+            message: "Created init blog",
+            txid,
+          });
+          return blog;
+        }
       } catch (e) {
+        console.log(e);
         notify({
           type: "error",
-          message: "Error, ply try later",
+          message: "Error, please try later",
         });
       }
     }
@@ -134,7 +155,7 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
 
     try {
       const blog = await program.account.blogState.fetch(blogAccount.publicKey);
-      const id = blog?.currentPostId;
+      const id = blog?.lastPostId;
 
       id && userId && (await fetchPosts(id, userId));
       return blog;
@@ -148,14 +169,13 @@ export const WalletProvider: React.FC<Props> = ({ children, walletAddress }) => 
   }, []);
 
   useEffect(() => {
-    const onGetUser = async (walletAddress: PublicKey) => {
+    const onGetUser = async (walletAddress: string) => {
       try {
         const user = await fetchUser(walletAddress);
         if (user) {
           const { initBlogKey } = getKeys();
           let blog;
           if (initBlogKey) blog = await fetchBlog(initBlogKey, user.id);
-
           setIsInitBlog(!blog);
         }
       } catch (err) {

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Footer, Header, Main, NotificationList } from "@components";
 import { appConfig } from "@config";
 import { useWallet } from "@hooks";

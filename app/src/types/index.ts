@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { PublicKey } from "@solana/web3.js";
+// import { PublicKey } from "@solana/web3.js";
 
 export enum ACCOUNT_ERROR {
   NOT_CREATED = "NOT_CREATED",
@@ -17,7 +17,7 @@ export interface PostCardData {
 }
 
 export type UseWallet = () => {
-  walletAddress?: PublicKey;
+  walletAddress?: string;
   connectWallet: () => Promise<void>;
 };
 

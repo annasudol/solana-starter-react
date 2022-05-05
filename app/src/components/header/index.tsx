@@ -1,10 +1,9 @@
 import { Button, ConnectWallet, Form } from "@components";
-import { PublicKey } from "@solana/web3.js";
 import { notify, truncateAddress } from "@utils";
 import * as React from "react";
 import { WalletSolContext, WalletSolContextType } from "src/context";
 interface Props {
-  walletAddress?: PublicKey;
+  walletAddress?: string;
   connectWallet: () => Promise<void>;
 }
 export const Header: React.FunctionComponent<Props> = ({ walletAddress, connectWallet }) => {
@@ -31,9 +30,7 @@ export const Header: React.FunctionComponent<Props> = ({ walletAddress, connectW
         <ConnectWallet onClick={connectWallet} />
       ) : (
         <>
-          <h3 className="font-bold text-gray-600 capitalize">
-            Connected: @{truncateAddress(walletAddress.toString())}
-          </h3>
+          <h3 className="font-bold text-gray-600 capitalize">Connected: @{truncateAddress(walletAddress)}</h3>
           {user === undefined && (
             <div className="mt-16">
               <svg className="animate-spin h-12 w-12 text-white mr-1" viewBox="0 0 24 24">
@@ -43,7 +40,7 @@ export const Header: React.FunctionComponent<Props> = ({ walletAddress, connectW
           )}
           {user === null && <Form btnTitle="Sign up" placeholder="User Name" onSubmit={onSignUpUser} />}
           {user && <p className="font-bold">Logged in as {user?.name}</p>}
-          {isInitBlog && <Button onClick={() => initBlog(walletAddress)}>initBlog</Button>}
+          {isInitBlog && <Button onClick={() => initBlog()}>initBlog</Button>}
         </>
       )}
     </header>
