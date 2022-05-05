@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
-// context/WalletSolContext.tsx
 import * as anchor from "@project-serum/anchor";
 import { Idl, IdlTypeDef } from "@project-serum/anchor/dist/cjs/idl";
 import { IdlTypes, TypeDef } from "@project-serum/anchor/dist/cjs/program/namespace/types";
