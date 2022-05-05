@@ -1,62 +1,17 @@
-const anchor = require("@project-serum/anchor");
-const assert = require("assert");
-const { createBlog } = require("./functions/createBlog");
-const { createUser } = require("./functions/createUser");
-const { createPost } = require("./functions/createPost");
+import * as anchor from '@project-serum/anchor';
+import { Program } from '@project-serum/anchor';
+import { Blog } from '../target/types/blog';
 
-describe("blog-sol", () => {
-  const provider = anchor.Provider.env();
-  anchor.setProvider(provider);
-  const program = anchor.workspace.BlogSol;
+describe('blog', () => {
 
-  it("initialize blog account", async () => {
-    const { blog, genesisPostAccount } = await createBlog(
-      program,
-      provider
-    );
+  // Configure the client to use the local cluster.
+  anchor.setProvider(anchor.Provider.env());
 
-    // console.log("Blog account key: ", blogAccount.publicKey.toString());
-    assert.equal(
-      blog.currentPostKey.toString(),
-      genesisPostAccount.publicKey.toString()
-    );
+  const program = anchor.workspace.Blog as Program<Blog>;
 
-    assert.equal(
-      blog.authority.toString(),
-      provider.wallet.publicKey.toString()
-    );
-  });
-
-  // return;
-
-  it("signup a new user", async () => {
-    const { user, name } = await createUser(program, provider);
-
-    assert.equal(user.name, name);
-
-    assert.equal(
-      user.authority.toString(),
-      provider.wallet.publicKey.toString()
-    );
-  });
-
-  it("creates a new post", async () => {
-    const { blog, blogAccount } = await createBlog(program, provider);
-    const { userAccount } = await createUser(program, provider);
-
-    const { title, post } = await createPost(
-      program,
-      provider,
-      blogAccount,
-      userAccount
-    );
-
-    assert.equal(post.title, title);
-    assert.equal(post.user.toString(), userAccount.publicKey.toString());
-    assert.equal(post.prePostKey.toString(), blog.currentPostKey.toString());
-    assert.equal(
-      post.authority.toString(),
-      provider.wallet.publicKey.toString()
-    );
+  it('Is initialized!', async () => {
+    // Add your test here.
+    const tx = await program.rpc.initialize({});
+    console.log("Your transaction signature", tx);
   });
 });
