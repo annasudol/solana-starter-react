@@ -26,7 +26,7 @@ export const Form: React.FunctionComponent<Props> = ({ onSubmit, placeholder = "
         onChange={(e) => handleChange(e.target.value)}
       />
 
-      <Button disabled={!!error.length}>{btnTitle}</Button>
+      <Button disabled={!!error.length || !input.length}>{btnTitle}</Button>
     </form>
   );
 };
