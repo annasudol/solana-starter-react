@@ -6,4 +6,5 @@ export { Header } from "./header";
 export { Main } from "./main";
 export { NotificationList } from "./notificationList";
 export { PostCard } from "./postCard";
+export { TextField } from "./textField";
 export { TransactionLink } from "./transactionLink";
